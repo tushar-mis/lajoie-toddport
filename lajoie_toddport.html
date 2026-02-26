@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>LAJOIE Toddport 4.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Space Mono', monospace;
+      color: #e0e0e0;
+    }
+
+    /* Grid overlay */
+    .screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Centre glow */
+    .screen::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(0,255,136,0.07) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
+      border-bottom: 1px solid rgba(0,255,136,0.18);
+      padding: env(safe-area-inset-top, 0px) 1.5rem 0;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
+      padding-bottom: 1.3rem;
+      text-align: center;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 50%;
+      transform: translateX(-50%);
+      width: 90px; height: 2px;
+      background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    }
+
+    .header-eyebrow {
+      font-size: 0.48rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(0,255,136,0.5);
+      margin-bottom: 0.45rem;
+    }
+
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.5rem, 7.5vw, 2.2rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+    }
+
+    .header-title .hl {
+      color: #00ff88;
+      text-shadow: 0 0 24px rgba(0,255,136,0.45);
+    }
+
+    /* ── MIDDLE ── */
+    .middle {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1.25rem;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: rgba(18,18,18,0.97);
+      border: 1px solid rgba(0,255,136,0.22);
+      border-radius: 14px;
+      padding: 2.2rem 1.75rem 1.9rem;
+      width: 100%;
+      max-width: 390px;
+      text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(0,255,136,0.04),
+        0 12px 50px rgba(0,0,0,0.7),
+        0 0 60px rgba(0,255,136,0.05);
+      animation: fadeUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .card-eyebrow {
+      font-size: 0.5rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(0,255,136,0.5);
+      margin-bottom: 0.35rem;
+    }
+
+    .card-heading {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1.6rem;
+    }
+
+    /* ── ID BOX ── */
+    .id-box {
+      background: #0a0a0a;
+      border: 1px solid rgba(0,255,136,0.14);
+      border-radius: 8px;
+      padding: 1.8rem 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .id-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 55%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.05), transparent);
+      animation: scan 2.8s ease-in-out infinite;
+    }
+
+    .corner { position: absolute; width: 13px; height: 13px; border-color: rgba(0,255,136,0.5); border-style: solid; }
+    .c-tl { top:6px; left:6px;    border-width:2px 0 0 2px; border-radius:2px 0 0 0; }
+    .c-tr { top:6px; right:6px;   border-width:2px 2px 0 0; border-radius:0 2px 0 0; }
+    .c-bl { bottom:6px; left:6px;  border-width:0 0 2px 2px; border-radius:0 0 0 2px; }
+    .c-br { bottom:6px; right:6px; border-width:0 2px 2px 0; border-radius:0 0 2px 0; }
+
+    .uid-label {
+      font-size: 0.48rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,255,136,0.32);
+      margin-bottom: 0.55rem;
+    }
+
+    .uid {
+      color: #00ff88;
+      font-size: clamp(2.6rem, 13vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      line-height: 1;
+      text-shadow: 0 0 28px rgba(0,255,136,0.35);
+    }
+
+    .meta {
+      font-size: 0.57rem;
+      color: rgba(255,255,255,0.18);
+      margin-top: 0.7rem;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 0.5rem;
+      background: transparent;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.13em;
+      cursor: pointer;
+      border-radius: 6px;
+      text-transform: uppercase;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-appearance: none;
+    }
+
+    .btn svg {
+      width: 13px; height: 13px;
+      fill: none; stroke: currentColor;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .btn:active {
+      background: #00ff88; color: #000;
+      transform: scale(0.97);
+    }
+
+    @media (hover: hover) {
+      .btn:hover { background: #00ff88; color: #000; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+      text-align: center;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.9rem);
+      padding-top: 0.6rem;
+      font-size: 0.46rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.1);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(0.5rem);
+      background: #00ff88; color: #000;
+      padding: 0.55rem 1.8rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transition: opacity 0.22s, transform 0.22s;
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,255,136,0.4);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scan {
+      0%   { left: -60%; }
+      100% { left: 160%; }
+    }
+  </style>
+</head>
+<body>
+<div class="screen">
+
+  <header>
+    <div class="header-eyebrow">official event registration</div>
+    <div class="header-title">
+      Welcome to <span class="hl">LAJOIE</span><br>Toddport 4.0
+    </div>
+  </header>
+
+  <div class="middle">
+    <div class="card">
+      <div class="card-eyebrow">scan registered</div>
+      <div class="card-heading">Your Unique Code Is</div>
+
+      <div class="id-box">
+        <div class="corner c-tl"></div>
+        <div class="corner c-tr"></div>
+        <div class="corner c-bl"></div>
+        <div class="corner c-br"></div>
+        <div class="uid-label">attendee id</div>
+        <div class="uid" id="uid-display"></div>
+        <div class="meta" id="meta-display"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" onclick="copyID()">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+        <button class="btn" onclick="newID()">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          New ID
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Toddport 4.0 &mdash; LAJOIE</footer>
+
+</div>
+
+<div class="toast" id="toast">&#10003; Copied!</div>
+
+<script>
+  var currentUID = '';
+
+  function generateUID() {
+    // LA- + 2 random letters + 4 random digits  e.g. LA-KX7291
+    var letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    var digits  = '0123456789';
+    var l = letters[Math.floor(Math.random()*letters.length)] +
+            letters[Math.floor(Math.random()*letters.length)];
+    var d = '';
+    for (var i = 0; i < 4; i++) d += digits[Math.floor(Math.random()*10)];
+    return 'LA-' + l + d;
+  }
+
+  function setID() {
+    currentUID = generateUID();
+    var now = new Date();
+    var timeStr = now.toLocaleString(undefined, {
+      month:'short', day:'numeric', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+    document.getElementById('uid-display').textContent  = currentUID;
+    document.getElementById('meta-display').textContent = 'Generated: ' + timeStr;
+  }
+
+  function newID() {
+    // Animate card out then back in
+    var card = document.querySelector('.card');
+    card.style.transition = 'opacity 0.18s, transform 0.18s';
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
+    setTimeout(function() {
+      setID();
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+      setTimeout(function() {
+        card.style.transition = '';
+      }, 200);
+    }, 180);
+  }
+
+  function copyID() {
+    if (!currentUID) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(currentUID).catch(fb);
+    } else { fb(); }
+    function fb() {
+      var t = document.createElement('textarea');
+      t.value = currentUID;
+      t.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(t); t.focus(); t.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(t);
+    }
+    var toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2200);
+  }
+
+  // Init
+  setID();
+</script>
+</body>
+</html>
